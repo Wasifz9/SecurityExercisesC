@@ -6,6 +6,13 @@
 
 #define TARGET "../targets/target1"
 
+// 46th byte is null in shell code
+#define SHELL_LENGTH 45 
+// NO-OP operation 
+#define NOP 0x90
+// 
+
+
 int
 main ( int argc, char * argv[] )
 {
