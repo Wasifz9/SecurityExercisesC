@@ -251,19 +251,7 @@ class BioConnect:
 			print(result.content)
 			sys.exit("Error: unexpected reply for QR code")
 
-		# print(reply)
-
-		# if ( 
-		# 	result.content['status'] == 'active' and 
-		# 	(
-		# 		result.content['face_status'] =='enrolled' or 
-		# 		result.content['voice_status'] =='enrolled' or 
-		# 		result.content['eye_status'] =='enrolled' or 
-		# 		result.content['fingerprint_status'] =='enrolled'
-		# 	)
-			
-
-		# ): 
+		# if active and one authentication methods is enrolled 	
 		if ( 
 			reply['status'] == 'active' and 
 			(
@@ -306,7 +294,7 @@ class BioConnect:
 			'transaction_id':	transactionId,		
 			'message': message
 		}
-		# Send POST request to the server
+		# Send POST request to the server to connected user ID
 		result = requests.post(url, data=json.dumps(data), headers=headers)
 
 		try:

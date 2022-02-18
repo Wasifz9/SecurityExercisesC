@@ -1,0 +1,24 @@
+#Wasif Zulkernine, 1004069376, wasif.zulkernine@mail.utoronto.ca
+#Krishna Solanki, studentnum2, e-mail address2
+
+
+## Part 2 
+
+- getAuthenticatorStatus(self):
+	- simple get and check on status is active and one 
+	  of 4 authetnication statuses are enrolled 
+	- this function loops for 2 minutes as it listens for 
+	  connection from a user mobile phone to the QR code endpoint
+
+- sendStepup(self,
+		transactionId = '%d' % int(time.time()),
+		message='Login request'):
+	- post to api with phone userID in payload to trigger pushing 
+	  authetnication request to user's phone 
+	- store verification of post request from response 
+
+- getStepupStatus(self):
+	- listens for authentication status change from request by
+	  user mobile phone 
+	- runs while status of verification = 'pending' after succesful
+	  entry of username and password
