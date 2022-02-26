@@ -25,6 +25,7 @@ class BioConnect:
 	userId			= ''
 	authenticatorId		= ''
 	stepupId		= ''
+	verificationId 		= ''
 
 	# ===== login: Authenticates and obtains access credentials
 
@@ -223,9 +224,49 @@ class BioConnect:
 		#    .../v2/users/<userId>/authenicators/<authenticatorId>
 		# and process the response
 
-		return('')
+		global	hostname
+
+		url = 'https://%s/v2/users/%s' \
+			'/authenticators/%s' % \
+			( hostname, self.userId, self.authenticatorId )	
+
+		headers = {
+			'Content-Type':		'application/json',
+			'accept':		'application/json',
+			'bcaccesskey':		self.bcaccesskey,
+			'bcentitykey':		self.bcentitykey,
+			'bctoken':		self.bctoken
+		}
+
+		# Send our GET request to the server
+		result = requests.get(url, headers=headers)
 
 
+		try:
+			# Parse the JSON reply
+			reply = json.loads(result.content.decode('utf-8'))
+
+		except ValueError:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unexpected reply for QR code")
+
+		# if active and one authentication methods is enrolled 	
+		if ( 
+			reply['status'] == 'active' and 
+			(
+				reply['face_status'] =='enrolled' or 
+				reply['voice_status'] =='enrolled' or 
+				reply['eye_status'] =='enrolled' or 
+				reply['fingerprint_status'] =='enrolled'
+			)
+			
+
+		): 
+			return ('active')
+		else:
+			return ('inactive')
+		
 	# ===== sendStepup: Pushes an authentication request to the mobile app
 
 	def sendStepup(self,
@@ -235,8 +276,40 @@ class BioConnect:
 		# >>> Add code here to call
 		#     .../v2/user_verifications
 		# to push an authentication request to the mobile device
+		global	hostname
 
-		pass
+		url = 'https://%s/v2/user_verifications' % hostname 	
+
+		headers = {
+			'Content-Type':		'application/json',
+			'accept':		'application/json',
+			'bcaccesskey':		self.bcaccesskey,
+			'bcentitykey':		self.bcentitykey,
+			'bctoken':		self.bctoken
+		}
+		
+
+		data = {
+			'user_uuid':		self.userId,
+			'transaction_id':	transactionId,		
+			'message': message
+		}
+		# Send POST request to the server to connected user ID
+		result = requests.post(url, data=json.dumps(data), headers=headers)
+
+		try:
+			# Parse the JSON reply
+			reply = json.loads(result.content.decode('utf-8'))
+
+	
+		# 
+		except ValueError:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unexpected reply for QR code")
+
+		self.verificationId = reply['user_verification']['uuid']
+	
 
 	# ===== getStepupStatus: Fetches the status of the user auth request
 
@@ -245,8 +318,37 @@ class BioConnect:
 		# >>> Add code here to call
 		#     .../v2/user_verifications/<verificationId>
 		# to poll for the current status of the verification
+		
 
-		return('declined')
+		global	hostname
+
+		url = 'https://%s/v2/user_verifications/%s' % \
+			( hostname, self.verificationId)	
+
+		headers = {
+			'Content-Type':		'application/json',
+			'accept':		'application/json',
+			'bcaccesskey':		self.bcaccesskey,
+			'bcentitykey':		self.bcentitykey,
+			'bctoken':		self.bctoken
+		}
+
+		# Send our GET request to the server
+		result = requests.get(url, headers=headers)
+
+
+		try:
+			# Parse the JSON reply
+			reply = json.loads(result.content.decode('utf-8'))
+
+		except ValueError:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unexpected reply for QR code")
+
+		status = reply['user_verification']['status']
+		
+		return status
 
 
 	# ===== deleteUser: Deletes the user and mobile phone entries
