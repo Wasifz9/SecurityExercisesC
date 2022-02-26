@@ -1,31 +1,86 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
+#include <time.h>
 
 #include "lib/sha1.h"
+
+#define TIME_STEP 30
 
 static int
 validateTOTP(char *secret_hex, char *TOTP_string)
 {
-	//TODO: implement
+	// TOTP is basically HTOP with the counter value being time
+	// The time value is calculated as: (T-To)/X where x is time step(=30s)
+	// and To is initial time value(=0)
+	time_t t = time(NULL);
+    long counter = t / TIME_STEP;
+
+	// convert counter to binary
+	uint8_t c[8];
+	for(int i = 7; i >= 0; --i){
+		c[i] = counter & 0xff;
+		counter >>= 8;
+	}
+
+    // convert secret hex string to binary
+	uint8_t k[10];
+    uint8_t str_len = strlen(secret_hex);
+
+    for (int i = 0; i < (str_len / 2); i++) 
+    {
+        sscanf(secret_hex + 2*i, "%02x", &k[i]);
+    }
+
+	// HMAC - H(K XOR opad, H(K XOR ipad, text))
+	// hash is SHA1
+	// first do K XORs
+	uint8_t outer_k[SHA1_BLOCKSIZE];
+	uint8_t inner_k[SHA1_BLOCKSIZE+1];
+
+	bzero( outer_k, sizeof outer_k);
+	bzero( inner_k, sizeof inner_k);
+	bcopy( k, inner_k, strlen(k));
+	bcopy( k, outer_k, strlen(k));
+
+	for(int i = 0; i < SHA1_BLOCKSIZE; ++i){
+		outer_k[i] ^= 0x5C;
+		inner_k[i] ^= 0x36;
+	}
+
+	// do inner hash first
 	SHA1_INFO ctx;
-	uint8_t sha[40];
+	uint8_t inner_hash[SHA1_DIGEST_LENGTH];
+
 	sha1_init(&ctx);
-	sha1_update(&ctx, secret_hex, strlen(secret_hex));
-	sha1_final(&ctx, sha);
+	sha1_update(&ctx, inner_k, SHA1_BLOCKSIZE);
+	sha1_update(&ctx, c, 8);
+	sha1_final(&ctx, inner_hash);
 
-	int offset = sha[39] & 0xf;
+	// do outter hash next
+	uint8_t final_hash[SHA1_DIGEST_LENGTH];
 
+	sha1_init(&ctx);
+	sha1_update(&ctx, outer_k, SHA1_BLOCKSIZE);
+	sha1_update(&ctx, inner_hash, SHA1_DIGEST_LENGTH);
+	sha1_final(&ctx, final_hash);
+
+    // Perform truncate function
+	int offset = final_hash[SHA1_DIGEST_LENGTH-1] & 0xf;
 	int binary =
-		((sha[offset] & 0x7f) << 24) |
-		((sha[offset + 1] & 0xff) << 16) |
-		((sha[offset + 2] & 0xff) << 8) |
-		(sha[offset + 3] & 0xff);
+		((final_hash[offset] & 0x7f) << 24) |
+		((final_hash[offset + 1] & 0xff) << 16) |
+		((final_hash[offset + 2] & 0xff) << 8) |
+		(final_hash[offset + 3] & 0xff);
 
-	int otp = binary % 1000000;
-	printf("totp: %s otp: %d \n", TOTP_string, otp);
+    // extract 6 digit number
+	int totp = binary % 1000000;
+	int input_totp = atoi(TOTP_string);
 
-	return (0);
+	printf("totp: %d otp: %d \n", input_totp, totp);
+
+	return (totp == input_totp);
 }
 
 int main(int argc, char *argv[])
