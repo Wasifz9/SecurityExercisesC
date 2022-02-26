@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
 
 	const char *encoded_issuer = urlEncode(issuer);
 	const char *encoded_accountName = urlEncode(accountName);
-	// char *encoded_secret_hex = malloc(strlen(secret_hex) * sizeof(char));
 
 	// Convert secret hex to binary since this is what base32_encode wants
 	uint8_t secret_binary[10];
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
         sscanf(secret_hex + 2*i, "%02x", &secret_binary[i]);
     }	
 
-	// if base32 encode fails it  returns -1
+	// if base32 encode fails it returns -1
 	uint8_t res[20];
 	int err = base32_encode(secret_binary, 10, res, 20);
 	if(err < 0)
@@ -44,8 +43,8 @@ int main(int argc, char *argv[])
 	}
 	
 
-	printf("\nIssuer: %s\nAccount Name: %s\nSecret (Hex): %s\n\n",
-		   encoded_issuer, encoded_accountName, res);
+	// printf("\nIssuer: %s\nAccount Name: %s\nSecret (Hex): %s\n\n",
+	// 	   encoded_issuer, encoded_accountName, res);
 
 	// Create an otpauth:// URI and display a QR code that's compatible
 	// with Google Authentication

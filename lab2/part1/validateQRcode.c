@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <math.h>
 #include <time.h>
 
 #include "lib/sha1.h"
@@ -36,7 +35,7 @@ validateTOTP(char *secret_hex, char *TOTP_string)
 	// HMAC - H(K XOR opad, H(K XOR ipad, text))
 	// hash is SHA1
 	// first do K XORs
-	uint8_t outer_k[SHA1_BLOCKSIZE];
+	uint8_t outer_k[SHA1_BLOCKSIZE+1];
 	uint8_t inner_k[SHA1_BLOCKSIZE+1];
 
 	bzero( outer_k, sizeof outer_k);
@@ -76,9 +75,12 @@ validateTOTP(char *secret_hex, char *TOTP_string)
 
     // extract 6 digit number
 	int totp = binary % 1000000;
+
+	// easier to compare nums so convert totp string to num
+	// if atoi fails it returns 0
 	int input_totp = atoi(TOTP_string);
 
-	printf("totp: %d otp: %d \n", input_totp, totp);
+	// printf("totp: %d otp: %d \n", input_totp, totp);
 
 	return (totp == input_totp);
 }
