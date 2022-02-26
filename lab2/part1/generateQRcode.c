@@ -24,31 +24,42 @@ int main(int argc, char *argv[])
 
 	const char *encoded_issuer = urlEncode(issuer);
 	const char *encoded_accountName = urlEncode(accountName);
-	char *encoded_secret_hex = malloc(strlen(secret_hex) * sizeof(char));
-	// printf("before encode!\n");
-	if (base32_encode(secret_hex, strlen(secret_hex), encoded_secret_hex, 20) < 0)
+	// char *encoded_secret_hex = malloc(strlen(secret_hex) * sizeof(char));
+
+	// Convert secret hex to binary since this is what base32_encode wants
+	uint8_t secret_binary[10];
+    uint8_t str_len = strlen(secret_hex);
+
+    for (int i = 0; i < (str_len / 2); i++) 
+    {
+        sscanf(secret_hex + 2*i, "%02x", &secret_binary[i]);
+    }	
+
+	// if base32 encode fails it  returns -1
+	uint8_t res[20];
+	int err = base32_encode(secret_binary, 10, res, 20);
+	if(err < 0)
 	{
 		printf("error in encoding hex!\n");
 	}
-	// printf("after encode!\n");
+	
+
 	printf("\nIssuer: %s\nAccount Name: %s\nSecret (Hex): %s\n\n",
-		   encoded_issuer, encoded_accountName, encoded_secret_hex);
+		   encoded_issuer, encoded_accountName, res);
 
 	// Create an otpauth:// URI and display a QR code that's compatible
 	// with Google Authentication
 	// Ideal URL - otpauth://totp/ACCOUNTNAME?issuer=ISSUER&secret=SECRET&period=30
 
 	char URL[50];
-	// printf("before URL creation\n");
+
 	sprintf(
 		URL,
 		"otpauth://totp/%s?issuer=%s&secret=%s&period=30",
 		encoded_accountName,
 		encoded_issuer,
-		encoded_secret_hex);
+		res);
 
-	// printf("after URL creation\n");
-	// printf("%s\n", URL);
 	displayQRcode(URL);
 
 	return (0);
