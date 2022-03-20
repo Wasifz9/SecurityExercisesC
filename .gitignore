@@ -2,6 +2,7 @@
 !*ECE568-lab1
 !*lab2
 !*lab3
+!*lab3/*.html
 !*lab3/*.jar
 !*.gitignore
 !*.txt

