@@ -4,5 +4,6 @@
 !*lab3
 !*lab3/*.html
 !*lab3/*.jar
+!*lab3/*README
 !*.gitignore
 !*.txt
