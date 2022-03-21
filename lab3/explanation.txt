@@ -1,0 +1,21 @@
+
+#Wasif Zulkernine, 1004069376, wasif.zulkernine@mail.utoronto.ca 
+
+
+Part 4 Explanation
+
+Inserted 2 iframes, which are responsible for exploiting the unchecked transfer field in the src attribute to hack the user into navigating to the link for transfering funds.  
+
+Part 6 Explanation 
+
+Exploited unchecked input to inject SQL statemement at the end of WHERE conditional which will always resolve to true, thereby retrieiving all records from the data base without specifying lastname.
+
+Part 8 Explanation:
+
+101 
+AND 
+EXISTS (SELECT * FROM credit WHERE cc_number=1234123412341234 AND pin >= <guess>)
+
+101 is always true and used to inject the real sql query above. Using guesses from 1
+0->10000 for size, then giong digit by digit from the left by increasing and checking validity until finding 3318
+

