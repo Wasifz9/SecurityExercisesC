@@ -17,5 +17,5 @@
 	<input type="text" id = "ece568_2022s_user"><br>
 	Enter password:
 	<input type="text" id = "ece568_2022s_pw"><br>	
-	<button onclick="onSubmit()">Login</button>
+	<button id = "ece568_2022s_submit" onclick="onSubmit()">Login</button>
 </form>

