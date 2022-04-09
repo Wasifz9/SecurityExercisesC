@@ -1,0 +1,29 @@
+#Wasif Zulkernine, 1004069376, wasif.zulkernine@mail.utoronto.ca
+#Krishna Solanki, 1004273528, krishna.solanki@mail.utoronto.ca
+
+-- Sploit 1 --
+
+There is a vulnterability in the target1 program within the foo() function where
+it preforms a strcpy of args[1] into a 96 byte buffer. We infiltrate the target 
+program through the args[1] variable which holds our attack_buffer. By extending 
+the length of our attack_buffer with NOPs enough such that it overwrites the return address 
+with the encapsualted exploit string, the sploit gains shell control of the target 
+machine. 
+
+rip - &buf = 120 bytes = length of our attack buffer
+last 4 bytes are the address of the start of the attac buffer:
+	-> where our shell code is
+		-> gives control 
+
+-- Sploit 3 -- 
+
+There is a vulnerability in the target program within the foo() function where 
+it calls bar() to copy up to 88 bytes from arg into buf when buf is limited at 
+the size of 64 bytes. The return address of buf is 64+4 bytes away from 
+the targ address, thus setting the size of our attack buffer at 72(4 more bytes for ret). 
+This case is similar to sploit 1, but the sprintf of 'AAAA' requires padding of NOP
+at the beginning of the attack buffer to cover the offset and ensure 
+our exploit string gets to the the return address.
+
+
+

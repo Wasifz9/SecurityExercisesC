@@ -1,0 +1,47 @@
+#Wasif Zulkernine, 1004069376, wasif.zulkernine@mail.utoronto.ca
+#Krishna Solanki, 1004273528, krishna.solanki@mail.utoronto.ca
+
+## Part 1
+
+- generateQRcode:
+	- simple function which takes in issuer, account name and 20 digit base32 secret.
+	- We take the issuer and account name and urlencode(provided) them to create OTP string.
+	- In order to base32 encode the secret we need to convert into byte array - done using sscanf
+	  and formatter 02x.
+	- Once everything is encoded we using sprintf to format the otp string correctly.
+	- This otp string is provided to a provided helper displayQRcode to display qr code.
+
+- validateQRcode:
+	- In order to validate totp value, this function takes in secrete in hex format to build
+	  a TOTP value and we compare it with input totp to confirm if its correct.
+	- To build TOTP we used RFC 6238, 4226 and 2104.
+	- We start off by getting time value from time lib and then convert it to binary for use as
+	  a counter in HTOP algo.
+	- We then convert secret into binary as well using sscanf (same one used in generateQRcode).
+	- With correct format we can now hash using HMCA_SHA1 - done by correctly xor the key with
+	  ipad, opad to create 2 new keys. The inner key is then sha1 hashed with our time binary.
+	  The output hash is then hashed with the second key.
+	- We then truncate this hash - code used from RFC 6238 to do this.
+	- To get a 6 digit # we divide by a million to reduce truncated binary int 
+	- This value is compared to an int representation of the provided TOTP string - done by using atoi
+
+## Part 2 
+
+- getAuthenticatorStatus(self):
+	- simple get and check on status is active and one 
+	  of 4 authetnication statuses are enrolled 
+	- this function loops for 2 minutes as it listens for 
+	  connection from a user mobile phone to the QR code endpoint
+
+- sendStepup(self,
+		transactionId = '%d' % int(time.time()),
+		message='Login request'):
+	- post to api with phone userID in payload to trigger pushing 
+	  authetnication request to user's phone 
+	- store verification of post request from response 
+
+- getStepupStatus(self):
+	- listens for authentication status change from request by
+	  user mobile phone 
+	- runs while status of verification = 'pending' after succesful
+	  entry of username and password
