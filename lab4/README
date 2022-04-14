@@ -3,6 +3,18 @@
 
 Part 1 Explanation: 
 Use dig utoronto.ca and dig utoronto.ca MX to get information for IPv4 and names of name servers and mail servers respectively. 
+1. utoronto.ca:<128.100.166.120>
+2. ns2.d-zone.ca:<162.219.55.2>
+2. ns1.d-zone.ca:<162.219.54.2>
+3. utoronto-ca.mail.protection.outlook.com:<104.47.75.164>
+3. utoronto-ca.mail.protection.outlook.com:<104.47.60.36>
+
+Using BIND server:
+1. utoronto.ca:<128.100.166.120>
+2. ns2.d-zone.ca:<162.219.55.2>
+2. ns1.d-zone.ca:<162.219.54.2>
+3. utoronto-ca.mail.protection.outlook.com:<104.47.75.164>
+3. utoronto-ca.mail.protection.outlook.com:<104.47.60.36>
 
 Part 2 Explanation: 
 
